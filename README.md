@@ -116,8 +116,4 @@ The `-L` flag follows the HTTP to HTTPS redirect and `-k` accepts the self-signe
 - Real stock-out data from government hospitals, if it is ever published.
 - Pharmacy and "double gap" ranking across the whole country, and suggested sites for new clinics or medicine drop-off points.
 - Walking-time distances instead of straight lines.
-- A Chichewa language option.
-
-## Built with AI assistance
-
-This project was vibe coded: I built it step by step with an AI assistant (Claude), running and testing each piece myself and fixing the problems described above.
+- A Chichewa langauge option
