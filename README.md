@@ -73,10 +73,31 @@ The app is static (HTML, JavaScript and one JSON file), so each web server only 
 
 ## How the load balancer is configured
 
-lb-01 (18.132.46.194) runs HAProxy. It listens for web traffic, redirects HTTP to HTTPS, and shares requests between web-01 and web-02 using round robin. Each web server's nginx adds an `X-Served-By` header with its own name, which makes the balancing visible.
+- HAproxy listens on port 80 and rediurects HTTP traffic to HTTPS.
+- The HTTPS fronted handles secure connections using an SSL certificate.
+- Requests are forwaded to the ' web_servers ' backend.
+- The round-robin algorthm distributes requests between web-01 and web-02
+- Health checks monitor the availability of both web servers.
 
 ```
-[PASTE THE frontend AND backend PARTS OF /etc/haproxy/haproxy.cfg HERE]
+
+frontend http_front
+    bind *:80
+    mode http
+    http-request redirect scheme https code 301
+
+frontend https_front
+    bind *:443 ssl crt /etc/haproxy/certs/www.malisaweb.tech.pem
+    mode http
+    http-request set-header X-Forwarded-Proto https
+    default_backend web_servers
+
+backend web_servers
+    mode http
+    balance roundrobin
+    server web-01 18.170.52.211:80 check
+    server web-02 18.175.133.12:80 check
+
 ```
 
 **Testing:** requests through the load balancer alternate between the two servers:
