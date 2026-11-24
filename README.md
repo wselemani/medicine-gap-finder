@@ -7,7 +7,7 @@ A web app that shows how far people in Malawi are from the nearest hospital, cli
 ## Links
 
 - **Live app (through the load balancer):** https://www.malisaweb.tech/gap/
-- **Same app by IP (self-signed certificate warning is expected):** https://18.132.46.194/gap/
+- **Same app by IP (a certificate warning is expected, because the certificate is issued for the domain name):** https://18.132.46.194/gap/
 - **Demo video (2 min):** [PASTE VIDEO LINK HERE]
 
 **Credentials and API keys:** none are needed. Every API used is open and keyless, and the app has no login.
@@ -22,9 +22,18 @@ Many people in rural Malawi travel long distances to a government hospital, only
 - **Search** facilities by name.
 - **Filter** by type, region and district.
 - **Sort** by name, district, or distance from the place you checked.
-- **Map** with colour-coded markers (red hospital, blue clinic or health post, green pharmacy, grey other).
+- **Map** that opens on Malawi, with colour-coded markers and a legend (red hospital, blue clinic or health post, green pharmacy, grey other) and a "Show all of Malawi" button.
+- **Screen sizes:** the layout adapts to the screen (map on top and controls below on narrow screens).
 - **Error handling:** clear messages when the facility data fails to load, when a place is not found, when the place search is unreachable (for example, no internet), and when filters match nothing.
 - **Load balancer proof:** a green bar shows which server answered (`Served by: 7401-web-01` or `7401-web-02`).
+
+## Why this isn't just a Google search
+
+Google Maps can show the nearest clinic to one spot. This app does things a single search does not:
+
+- It shows the nearest hospital, clinic **and** pharmacy together, with distances, and gives one verdict (good access, limited access or underserved). It also warns when no pharmacy is within 10 km, which matters when people travel to a hospital and find no medicine.
+- It lets you filter and sort a national list of facilities by type, region, district or distance from a place you choose.
+- It turns scattered map points into a gap analysis, which is the question planners ask: where is help missing?
 
 ## APIs and data sources
 
@@ -47,7 +56,7 @@ Map and place data © OpenStreetMap contributors (ODbL). Thank you to the OpenSt
    ```
 4. Open http://localhost:8000 in your browser.
 
-No installation, build step or API key is needed.
+No installation, build step or API key is needed. An internet connection is required for the map tiles and the place search.
 
 To rebuild `data.json` from the downloaded export (optional): `python build_data.py`.
 
@@ -73,14 +82,16 @@ The app is static (HTML, JavaScript and one JSON file), so each web server only 
 
 ## How the load balancer is configured
 
-- HAproxy listens on port 80 and rediurects HTTP traffic to HTTPS.
-- The HTTPS fronted handles secure connections using an SSL certificate.
-- Requests are forwaded to the ' web_servers ' backend.
-- The round-robin algorthm distributes requests between web-01 and web-02
+lb-01 (18.132.46.194) runs HAProxy.
+
+- HAProxy listens on port 80 and redirects HTTP traffic to HTTPS.
+- The HTTPS frontend handles secure connections using a Let's Encrypt certificate for www.malisaweb.tech.
+- Requests are forwarded to the `web_servers` backend.
+- The round-robin algorithm distributes requests between web-01 and web-02.
 - Health checks monitor the availability of both web servers.
+- Each web server's nginx adds an `X-Served-By` header with its own name, which makes the balancing visible.
 
 ```
-
 frontend http_front
     bind *:80
     mode http
@@ -97,7 +108,6 @@ backend web_servers
     balance roundrobin
     server web-01 18.170.52.211:80 check
     server web-02 18.175.133.12:80 check
-
 ```
 
 **Testing:** requests through the load balancer alternate between the two servers:
@@ -113,15 +123,17 @@ x-served-by: 7401-web-01
 x-served-by: 7401-web-02
 ```
 
-The `-L` flag follows the HTTP to HTTPS redirect and `-k` accepts the self-signed certificate on the IP address.
+The `-L` flag follows the HTTP to HTTPS redirect and `-k` accepts the certificate mismatch on the IP address.
 
 ## Challenges and how I solved them
 
 1. **API rejected my requests (HTTP 406).** The Overpass API refused Python's default request headers. I added a descriptive `User-Agent` header, and the requests worked.
 2. **The free OpenStreetMap servers were overloaded (502 and 504 errors, timeouts).** Large downloads failed repeatedly on three different servers, even after retries and splitting the area into smaller pieces. I switched to the same OpenStreetMap health facility data published as a file by HOT on the Humanitarian Data Exchange, and converted it to a small `data.json` that loads instantly.
 3. **No village list.** The village download failed for the same reason. Instead of a fixed list, the app uses the live Nominatim place search, so users can check any place name in Malawi.
-4. **Pasting code into the terminal.** Long pasted scripts were cut off or pasted twice. I switched to writing files in VS Code and keeping terminal commands short.
-5. **The load balancer redirects HTTP to HTTPS.** My first check returned 301, so the balancing test needed `-L` to follow the redirect.
+4. **Map opened on all of Africa.** My first deployed version did not zoom to Malawi. I changed the code to fit the map to the facility locations, limited zooming out, and added a legend and a reset button.
+5. **Stray text on the page.** A pasting mistake removed the first character of the HTML file, which showed `!DOCTYPE html>` on the page. I fixed the line and redeployed to both servers.
+6. **Pasting code into the terminal.** Long pasted scripts were cut off or pasted twice. I switched to writing files in VS Code and keeping terminal commands short.
+7. **The load balancer redirects HTTP to HTTPS.** My first check returned 301, so the balancing test needed `-L` to follow the redirect.
 
 ## Data limitations (please read)
 
@@ -137,4 +149,4 @@ The `-L` flag follows the HTTP to HTTPS redirect and `-k` accepts the self-signe
 - Real stock-out data from government hospitals, if it is ever published.
 - Pharmacy and "double gap" ranking across the whole country, and suggested sites for new clinics or medicine drop-off points.
 - Walking-time distances instead of straight lines.
-- A Chichewa langauge option
+- A Chichewa language option.
