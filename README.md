@@ -131,9 +131,7 @@ The `-L` flag follows the HTTP to HTTPS redirect and `-k` accepts the certificat
 2. **The free OpenStreetMap servers were overloaded (502 and 504 errors, timeouts).** Large downloads failed repeatedly on three different servers, even after retries and splitting the area into smaller pieces. I switched to the same OpenStreetMap health facility data published as a file by HOT on the Humanitarian Data Exchange, and converted it to a small `data.json` that loads instantly.
 3. **No village list.** The village download failed for the same reason. Instead of a fixed list, the app uses the live Nominatim place search, so users can check any place name in Malawi.
 4. **Map opened on all of Africa.** My first deployed version did not zoom to Malawi. I changed the code to fit the map to the facility locations, limited zooming out, and added a legend and a reset button.
-5. **Stray text on the page.** A pasting mistake removed the first character of the HTML file, which showed `!DOCTYPE html>` on the page. I fixed the line and redeployed to both servers.
-6. **Pasting code into the terminal.** Long pasted scripts were cut off or pasted twice. I switched to writing files in VS Code and keeping terminal commands short.
-7. **The load balancer redirects HTTP to HTTPS.** My first check returned 301, so the balancing test needed `-L` to follow the redirect.
+5. **The load balancer redirects HTTP to HTTPS.** My first check returned 301, so the balancing test needed `-L` to follow the redirect.
 
 ## Data limitations (please read)
 
