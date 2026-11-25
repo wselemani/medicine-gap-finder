@@ -8,7 +8,7 @@ A web app that shows how far people in Malawi are from the nearest hospital, cli
 
 - **Live app (through the load balancer):** https://www.malisaweb.tech/gap/
 - **Same app by IP (a certificate warning is expected, because the certificate is issued for the domain name):** https://18.132.46.194/gap/
-- **Demo video (2 min):** https://www.youtube.com/watch?v=3Pq5nNpvXzE 
+- **Demo video (2 min):** https://youtu.be/RIlkcO670hs
 
 **Credentials and API keys:** none are needed. Every API used is open and keyless, and the app has no login.
 
