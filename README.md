@@ -8,7 +8,7 @@ A web app that shows how far people in Malawi are from the nearest hospital, cli
 
 - **Live app (through the load balancer):** https://www.malisaweb.tech/gap/
 - **Same app by IP (a certificate warning is expected, because the certificate is issued for the domain name):** https://18.132.46.194/gap/
-- **Demo video (2 min):** [PASTE VIDEO LINK HERE]
+- **Demo video (2 min):** https://www.youtube.com/watch?v=3Pq5nNpvXzE 
 
 **Credentials and API keys:** none are needed. Every API used is open and keyless, and the app has no login.
 
@@ -147,4 +147,4 @@ The `-L` flag follows the HTTP to HTTPS redirect and `-k` accepts the certificat
 - Real stock-out data from government hospitals, if it is ever published.
 - Pharmacy and "double gap" ranking across the whole country, and suggested sites for new clinics or medicine drop-off points.
 - Walking-time distances instead of straight lines.
-- A Chichewa language option.
+- Chichewa language option.
